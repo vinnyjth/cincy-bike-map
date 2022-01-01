@@ -3,7 +3,7 @@ require 'net/http'
 require 'json'
 require 'pg'
 
-CONN = PG.connect :dbname => 'bikemap', :user => 'vincent'
+CONN = PG.connect "***REMOVED***"
 
 def quote_string(v)
   v.to_s.gsub(/\\/, '\&\&').gsub(/'/, "''")
