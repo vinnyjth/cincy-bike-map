@@ -5,6 +5,39 @@ require 'pg'
 
 CONN = PG.connect :dbname => 'bikemap', :user => 'vincent'
 
+def quote_string(v)
+  v.to_s.gsub(/\\/, '\&\&').gsub(/'/, "''")
+end
+
+
+def insert_lines(type:, layer_name:, layers:)
+  layer = layers.find { |l| l["id"].include? layer_name }
+
+  lines = layer["featureCollection"]["layers"][0]["featureSet"]["features"]
+
+  lines.each do |r|
+    line = r["geometry"]["paths"][0].map { |p| "ST_MakePoint(#{p[0]}.0, #{p[1]}.0)" }.join(", ")
+
+    line_name = r["attributes"]["RouteName"] && r["attributes"]["SystemName"] &&
+      quote_string(r["attributes"]["RouteName"] + " " + r["attributes"]["SystemName"])
+    CONN.exec """
+    INSERT INTO features
+      (name, type, geog_line)
+      VALUES(
+        '#{line_name}',
+        '#{type}',
+        ST_Transform(
+          ST_SetSRID(
+            ST_MakeLine(
+              ARRAY[ #{line} ]
+            ),
+            3857
+          ),
+          4326
+        )
+      )"""
+  end
+end
 
 def tst_data
   tst_map_url = "https://greenumbrella.maps.arcgis.com/sharing/rest/content/items/914acd14d70e49aaaece4fd88437ccdb/data?f=json"
@@ -21,17 +54,28 @@ def tst_data
 
   repair_stations = repair_stations_meta["featureCollection"]["layers"][0]["featureSet"]["features"]
 
-
   repair_stations.each do |r|
     CONN.exec """
     INSERT INTO features
-      (name, type, geog)
+      (name, type, geog_point)
       VALUES(
         '#{r["attributes"]["AgencyName"]} #{r["attributes"]["Amenity"]}',
         'bike-repair-station',
         ST_Transform(ST_SetSRID(ST_MakePoint(#{r["geometry"]["x"]}.0, #{r["geometry"]["y"]}.0),3857), 4326)
       )"
   end
+
+  ### On-Road Bike Facilities
+  insert_lines(type: 'bike-lane', layer_name: "BikeLanes_", layers: layers)
+
+  ### Multi Use Paths
+  insert_lines(type: 'multi-use-path', layer_name: "Multi-UsePaths", layers: layers)
+
+  ### Slow Streets
+  insert_lines(type: 'tst-slow-street', layer_name: "SlowStreet", layers: layers)
+
+  ### Use With Caution
+  insert_lines(type: 'tst-use-with-caution', layer_name: "UseWithCaution", layers: layers)
 end
 
 def red_bike_data
@@ -51,7 +95,7 @@ def red_bike_data
   stations.each do |s|
     CONN.exec """
     INSERT INTO features
-      (name, type, geog)
+      (name, type, geog_point)
       VALUES(
         '#{s['name']}',
         'red-bike-station',
@@ -61,5 +105,7 @@ def red_bike_data
 
 end
 
-# tst_data()
+CONN.exec "delete from features;"
+
+tst_data()
 red_bike_data()

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import PointFeature from './features/point-feature';
+import LineFeature from './features/line-feature';
 
 MapboxGL.setAccessToken('N2nAGwZyiTGggBTwzZcv');
 
@@ -91,6 +92,35 @@ function MapView() {
           defaultSettings={{
             centerCoordinate: [-84.512016, 39.143119],
             zoomLevel: 11,
+          }}
+        />
+        <LineFeature
+          featureName="bike-lane"
+          style={{
+            lineDasharray: [2, 4],
+            lineWidth: 2,
+            lineColor: '#099e1d',
+          }}
+        />
+        <LineFeature
+          featureName="multi-use-path"
+          style={{
+            lineWidth: 2,
+            lineColor: '#099e1d',
+          }}
+        />
+        <LineFeature
+          featureName="tst-slow-street"
+          style={{
+            lineWidth: 2,
+            lineColor: '#00e6b4',
+          }}
+        />
+        <LineFeature
+          featureName="tst-use-with-caution"
+          style={{
+            lineWidth: 2,
+            lineColor: '#e8a813',
           }}
         />
         <PointFeature

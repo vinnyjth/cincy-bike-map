@@ -8,19 +8,49 @@ const pool = new Pool({
   port: 5432,
 })
 
-function respond(req, res, next) {
-  pool.query(`SELECT ST_XMax(geog::geometry) as long, ST_YMax(geog::geometry) as lat, name FROM features WHERE type = '${req.params.type}' ORDER BY id ASC`, (error, results) => {
+function respondPoint(req, res, next) {
+  pool.query(`SELECT 
+      ST_AsGeoJSON(geog_point) as geo_json, name FROM features WHERE type = '${req.params.type}' ORDER BY id ASC`, (error, results) => {
     if (error) {
       throw error
     }
-    res.send(results.rows);
+    res.send(results.rows.map(({ geo_json, ...rest }) => ({
+      ...rest,
+      geo_json: JSON.parse(geo_json)
+    })));
+    next();
+  })
+}
+
+function respondLine(req, res, next) {
+  pool.query(`
+    SELECT
+      ST_AsGeoJSON(geog_line) as geo_json,
+      name
+    FROM
+      features
+    WHERE
+      type = '${req.params.type}'
+    ORDER BY id ASC
+  `, (error, results) => {
+    if (error) {
+      throw error
+    }
+    res.send(results.rows.map(({ geo_json, ...rest }) => ({
+      ...rest,
+      geo_json: JSON.parse(geo_json)
+    })));
     next();
   })
 }
 
 var server = restify.createServer();
-server.get('/features/:type', respond);
-server.head('/features/:type', respond);
+server.get('/point-features/:type', respondPoint);
+server.head('/point-features/:type', respondPoint);
+
+server.get('/line-features/:type', respondLine);
+server.head('/line-features/:type', respondLine);
+
 
 server.listen(8080, function() {
   console.log('%s listening at %s', server.name, server.url);

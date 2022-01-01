@@ -7,9 +7,9 @@ export default ({featureName, featureImage, style}) => {
 
   React.useEffect(async () => {
     const stations = await fetch(
-      SERVER_URL + `point-features/${featureName}`,
+      SERVER_URL + `line-features/${featureName}`,
     ).then(r => r.json());
-
+    console.log(stations, SERVER_URL + `line-features/${featureName}`);
     setStations(stations);
   }, []);
 
@@ -31,13 +31,10 @@ export default ({featureName, featureImage, style}) => {
           })),
         }}
       />
-      <MapboxGL.SymbolLayer
+      <MapboxGL.LineLayer
         id={featureName}
         sourceID={featureName}
         style={{
-          iconImage: featureImage,
-          iconSize: 0.05,
-          iconAllowOverlap: true,
           ...style,
         }}
       />
