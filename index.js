@@ -1,11 +1,16 @@
 const restify = require('restify');
 const Pool = require('pg').Pool
 
+// const pool = new Pool({
+//   user: 'vincent',
+//   host: 'localhost',
+//   database: 'bikemap',
+//   port: 5432,
+// })
+
+const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({
-  user: 'vincent',
-  host: 'localhost',
-  database: 'bikemap',
-  port: 5432,
+  connectionString,
 })
 
 function respondPoint(req, res, next) {
@@ -52,6 +57,6 @@ server.get('/line-features/:type', respondLine);
 server.head('/line-features/:type', respondLine);
 
 
-server.listen(8080, function() {
+server.listen(process.env.PORT || 8080, function() {
   console.log('%s listening at %s', server.name, server.url);
 });
