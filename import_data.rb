@@ -22,7 +22,7 @@ def insert_lines(type:, layer_name:, layers:)
       quote_string(r["attributes"]["RouteName"] + " " + r["attributes"]["SystemName"])
     CONN.exec """
     INSERT INTO features
-      (name, type, geog_line)
+      (name, type, geog_line, data)
       VALUES(
         '#{line_name}',
         '#{type}',
@@ -34,7 +34,8 @@ def insert_lines(type:, layer_name:, layers:)
             3857
           ),
           4326
-        )
+        ),
+        '#{quote_string(r["attributes"].to_json)}'
       )"""
   end
 end
@@ -95,11 +96,12 @@ def red_bike_data
   stations.each do |s|
     CONN.exec """
     INSERT INTO features
-      (name, type, geog_point)
+      (name, type, geog_point, data)
       VALUES(
-        '#{s['name']}',
+        'Ride Bike Station - #{s['name']}',
         'red-bike-station',
-        ST_MakePoint(#{s["longitude"]}, #{s["latitude"]})
+        ST_MakePoint(#{s["longitude"]}, #{s["latitude"]}),
+        '#{quote_string(s.to_json)}'
       )"
   end
 

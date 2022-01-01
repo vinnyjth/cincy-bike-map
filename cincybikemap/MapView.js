@@ -10,6 +10,11 @@ import {
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import PointFeature from './features/point-feature';
 import LineFeature from './features/line-feature';
+import SelectedFeatureCallout from './selected-feature-callout';
+import LegendButton from './ui/legend-button';
+import Legend from './ui/legend';
+import BottomSheet from '@gorhom/bottom-sheet';
+import {COLORS, ICONS} from './config.js';
 
 MapboxGL.setAccessToken('N2nAGwZyiTGggBTwzZcv');
 
@@ -34,6 +39,8 @@ const styles = StyleSheet.create({
 
 function MapView() {
   const _map = useRef(null);
+  const bottomSheet = useRef(null);
+  const legendSheet = useRef(null);
 
   const [selectedFeature, setSelectedFeature] = useState(null);
 
@@ -45,9 +52,10 @@ function MapView() {
     );
 
     if (features.length) {
-      console.log(features[0]);
+      bottomSheet.current.expand();
       setSelectedFeature(features[0]);
     } else {
+      bottomSheet.current.close();
       setSelectedFeature(null);
     }
   };
@@ -62,32 +70,25 @@ function MapView() {
     Linking.openURL(gmapsLink);
   };
 
+  const [bikeLaneShown, setBikeLaneShown] = useState(true);
+  const [slowStreetShown, setSlowStreetShown] = useState(true);
+  const [cautionStreetShown, setCautionStreetShown] = useState(true);
+  const [redBikeShown, setRedBikeShown] = useState(true);
+  const [bikeRepairShown, setBikeRepairShown] = useState(true);
+
   return (
     <>
-      <View style={styles.infoContainer}>
-        <View
-          style={[
-            styles.info,
-            {transform: [{translateY: selectedFeature ? 0 : 300}]},
-          ]}>
-          <SafeAreaView>
-            <View>
-              <Text>Test</Text>
-              <TouchableHighlight onPress={navigateToSelectedFeature}>
-                <Text>Navigate Here</Text>
-              </TouchableHighlight>
-            </View>
-          </SafeAreaView>
-        </View>
-      </View>
       <MapboxGL.MapView
         ref={_map}
         style={styles.map}
         styleJSON={
           'https://api.maptiler.com/maps/streets/style.json?key=N2nAGwZyiTGggBTwzZcv'
         }
+        onDidFailLoadingMap={console.log}
         logoEnabled={false}
+        showUserLocation
         onPress={handlePress}>
+        <MapboxGL.UserLocation renderMode={'normal'} />
         <MapboxGL.Camera
           defaultSettings={{
             centerCoordinate: [-84.512016, 39.143119],
@@ -99,40 +100,75 @@ function MapView() {
           style={{
             lineDasharray: [2, 4],
             lineWidth: 2,
-            lineColor: '#099e1d',
+            lineColor: COLORS.BIKE_LANE,
           }}
+          visible={bikeLaneShown}
         />
         <LineFeature
           featureName="multi-use-path"
           style={{
             lineWidth: 2,
-            lineColor: '#099e1d',
+            lineColor: COLORS.BIKE_LANE,
           }}
+          visible={bikeLaneShown}
         />
         <LineFeature
           featureName="tst-slow-street"
           style={{
             lineWidth: 2,
-            lineColor: '#00e6b4',
+            lineColor: COLORS.SLOW_STREET,
           }}
+          visible={slowStreetShown}
         />
         <LineFeature
           featureName="tst-use-with-caution"
           style={{
             lineWidth: 2,
-            lineColor: '#e8a813',
+            lineColor: COLORS.USE_WITH_CAUTION,
           }}
+          visible={cautionStreetShown}
         />
         <PointFeature
           featureName="bike-repair-station"
-          featureImage={require('./features/support.png')}
+          featureImage={ICONS.BIKE_REPAIR}
+          visible={bikeRepairShown}
         />
         <PointFeature
           featureName="red-bike-station"
-          featureImage={require('./features/red-bike.png')}
+          featureImage={ICONS.RED_BIKE}
           style={{iconSize: 0.2}}
+          visible={redBikeShown}
         />
       </MapboxGL.MapView>
+      <LegendButton onPress={() => legendSheet?.current?.expand()} />
+      <BottomSheet
+        ref={bottomSheet}
+        enablePanDownToClose
+        index={-1}
+        snapPoints={['20%']}>
+        <SelectedFeatureCallout
+          {...selectedFeature?.properties}
+          handleNavigate={navigateToSelectedFeature}
+        />
+      </BottomSheet>
+      <BottomSheet
+        ref={legendSheet}
+        enablePanDownToClose
+        index={-1}
+        snapPoints={['40%']}>
+        <Legend
+          bikeLaneShown={bikeLaneShown}
+          slowStreetShown={slowStreetShown}
+          cautionStreetShown={cautionStreetShown}
+          redBikeShown={redBikeShown}
+          bikeRepairShown={bikeRepairShown}
+          setBikeLaneShown={setBikeLaneShown}
+          setSlowStreetShown={setSlowStreetShown}
+          setCautionStreetShown={setCautionStreetShown}
+          setRedBikeShown={setRedBikeShown}
+          setBikeRepairShown={setBikeRepairShown}
+        />
+      </BottomSheet>
     </>
   );
 }

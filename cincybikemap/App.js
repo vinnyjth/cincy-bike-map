@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {StyleSheet, View} from 'react-native';
 import MapView from './MapView';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const styles = StyleSheet.create({
   page: {
@@ -19,11 +20,11 @@ const styles = StyleSheet.create({
 export default class App extends Component {
   render() {
     return (
-      <View style={styles.page}>
+      <GestureHandlerRootView style={styles.page}>
         <View style={styles.container}>
           <MapView />
         </View>
-      </View>
+      </GestureHandlerRootView>
     );
   }
 }

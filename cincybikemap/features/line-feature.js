@@ -2,15 +2,16 @@ import React from 'react';
 import {SERVER_URL} from '../config';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 
-export default ({featureName, featureImage, style}) => {
+export default ({featureName, featureImage, style, visible}) => {
   const [stations, setStations] = React.useState([]);
 
-  React.useEffect(async () => {
-    const stations = await fetch(
-      SERVER_URL + `line-features/${featureName}`,
-    ).then(r => r.json());
-    console.log(stations, SERVER_URL + `line-features/${featureName}`);
-    setStations(stations);
+  React.useEffect(() => {
+    (async () => {
+      const stations = await fetch(
+        SERVER_URL + `line-features/${featureName}`,
+      ).then(r => r.json());
+      setStations(stations);
+    })();
   }, []);
 
   return (
@@ -23,7 +24,6 @@ export default ({featureName, featureImage, style}) => {
             type: 'Feature',
             properties: {
               type: featureName,
-              tappable: true,
             },
             geometry: {
               ...geo_json,
@@ -35,6 +35,7 @@ export default ({featureName, featureImage, style}) => {
         id={featureName}
         sourceID={featureName}
         style={{
+          visibility: visible ? 'visible' : 'none',
           ...style,
         }}
       />

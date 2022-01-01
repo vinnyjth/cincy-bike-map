@@ -10,9 +10,14 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@gorhom/bottom-sheet": "^4.1.5",
+    "@react-native-community/checkbox": "^0.5.9",
     "@react-native-mapbox-gl/maps": "^8.5.0",
     "react": "17.0.2",
-    "react-native": "0.66.4"
+    "react-native": "0.66.4",
+    "react-native-gesture-bottom-sheet": "^1.1.0",
+    "react-native-gesture-handler": "^2.1.0",
+    "react-native-reanimated": "^2.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
