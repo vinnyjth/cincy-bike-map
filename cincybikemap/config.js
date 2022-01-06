@@ -9,4 +9,5 @@ export const COLORS = {
 export const ICONS = {
   RED_BIKE: require('./features/red-bike.png'),
   BIKE_REPAIR: require('./features/support.png'),
+  BIKE_SHOP: require('./features/bike-shop.png'),
 };

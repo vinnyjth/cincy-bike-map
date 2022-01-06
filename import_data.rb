@@ -2,6 +2,8 @@ require 'uri'
 require 'net/http'
 require 'json'
 require 'pg'
+require 'csv'
+require 'open-uri'
 
 CONN = PG.connect "***REMOVED***"
 
@@ -41,6 +43,23 @@ def insert_lines(type:, layer_name:, layers:)
 end
 
 def tst_data
+  tst_map_url = "https://greenumbrella.maps.arcgis.com/sharing/rest/content/items/5c30ac77540f4e23b80be526f0ae3d48/data?f=json"
+
+  uri = URI(tst_map_url)
+  res = Net::HTTP.get_response(uri)
+  result = JSON.parse(res.body) if res.is_a?(Net::HTTPSuccess)
+
+  layers = result["operationalLayers"]
+
+
+  ### On-Road Bike Facilities
+  insert_lines(type: 'bike-lane', layer_name: "BikeOnRoad", layers: layers)
+
+  ### Multi Use Paths
+  insert_lines(type: 'multi-use-path', layer_name: "TST_MUPath", layers: layers)
+end
+
+def tst_data_calm_streets
   tst_map_url = "https://greenumbrella.maps.arcgis.com/sharing/rest/content/items/914acd14d70e49aaaece4fd88437ccdb/data?f=json"
 
   uri = URI(tst_map_url)
@@ -65,12 +84,6 @@ def tst_data
         ST_Transform(ST_SetSRID(ST_MakePoint(#{r["geometry"]["x"]}.0, #{r["geometry"]["y"]}.0),3857), 4326)
       )"
   end
-
-  ### On-Road Bike Facilities
-  insert_lines(type: 'bike-lane', layer_name: "BikeLanes_", layers: layers)
-
-  ### Multi Use Paths
-  insert_lines(type: 'multi-use-path', layer_name: "Multi-UsePaths", layers: layers)
 
   ### Slow Streets
   insert_lines(type: 'tst-slow-street', layer_name: "SlowStreet", layers: layers)
@@ -107,7 +120,24 @@ def red_bike_data
 
 end
 
+def bike_shop_data
+  res = URI.open("https://docs.google.com/spreadsheets/d/e/2PACX-1vQQpjflUVU_-MLrpHRRdBzloDuaMahIhjVTFvwCpAOZWb6Xl4R0dKXL7z33bvDGGtzp51S8RPBecOMr/pub?gid=0&single=true&output=csv").read
+  csv = CSV.parse(res, headers: true)
+  csv.each do |shop|
+    CONN.exec """
+    INSERT INTO features
+      (name, type, geog_point)
+      VALUES(
+        '#{quote_string(shop["NAME"])}',
+        'bike-shop',
+        ST_MakePoint(#{shop["Longitude"]}, #{shop["Latitude"]})
+      )"    
+  end
+end
+
 CONN.exec "delete from features;"
 
 tst_data()
+tst_data_calm_streets()
 red_bike_data()
+bike_shop_data()
