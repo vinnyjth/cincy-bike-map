@@ -1,12 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {
-  View,
-  StyleSheet,
-  Text,
-  SafeAreaView,
-  TouchableHighlight,
-  Linking,
-} from 'react-native';
+import {StyleSheet, Linking} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import PointFeature from './features/point-feature';
 import LineFeature from './features/line-feature';
@@ -76,8 +69,9 @@ function MapView() {
   const [bikeLaneShown, setBikeLaneShown] = useState(true);
   const [slowStreetShown, setSlowStreetShown] = useState(true);
   const [cautionStreetShown, setCautionStreetShown] = useState(true);
-  const [redBikeShown, setRedBikeShown] = useState(true);
+  const [redBikeShown, setRedBikeShown] = useState(false);
   const [bikeRepairShown, setBikeRepairShown] = useState(true);
+  const [bikeShopShown, setBikeShopShown] = useState(true);
 
   return (
     <>
@@ -85,23 +79,21 @@ function MapView() {
         ref={_map}
         style={styles.map}
         styleJSON={
-          'https://api.maptiler.com/maps/streets/style.json?key=N2nAGwZyiTGggBTwzZcv'
+          'https://api.maptiler.com/maps/11e6eaeb-2b76-4eab-b098-bc0b0b1840cc/style.json?key=N2nAGwZyiTGggBTwzZcv'
         }
-        onDidFailLoadingMap={console.log}
+        onDidFailLoadingMap={(e) => console.log('failed', e)}
         logoEnabled={false}
         showUserLocation
         compassEnabled
         compassViewPosition={0}
-        onPress={handlePress}
-        
-        >
-        <MapboxGL.UserLocation renderMode={'normal'} ref={userLocation}/>
+        onPress={handlePress}>
+        <MapboxGL.UserLocation renderMode={'normal'} ref={userLocation} />
         <MapboxGL.Camera
           ref={camera}
           minZoomLevel={10}
           maxBounds={{
             ne: [-83.008239, 39.824396],
-            sw: [-86.024447, 38.426663]
+            sw: [-86.024447, 38.426663],
           }}
           defaultSettings={{
             centerCoordinate: [-84.512016, 39.143119],
@@ -112,7 +104,11 @@ function MapView() {
           featureName="bike-lane"
           style={{
             lineDasharray: [2, 4],
-            lineWidth: 2,
+            lineWidth: [
+              "step", ["zoom"],
+              12, 2,
+              13.5, 5,
+            ],
             lineColor: COLORS.BIKE_LANE,
           }}
           visible={bikeLaneShown}
@@ -120,7 +116,11 @@ function MapView() {
         <LineFeature
           featureName="multi-use-path"
           style={{
-            lineWidth: 2,
+            lineWidth: [
+              "step", ["zoom"],
+              12, 2,
+              13.5, 5,
+            ],
             lineColor: COLORS.BIKE_LANE,
           }}
           visible={bikeLaneShown}
@@ -128,7 +128,11 @@ function MapView() {
         <LineFeature
           featureName="tst-slow-street"
           style={{
-            lineWidth: 2,
+            lineWidth: [
+              "step", ["zoom"],
+              12, 2,
+              13.5, 5,
+            ],
             lineColor: COLORS.SLOW_STREET,
           }}
           visible={slowStreetShown}
@@ -136,7 +140,11 @@ function MapView() {
         <LineFeature
           featureName="tst-use-with-caution"
           style={{
-            lineWidth: 2,
+            lineWidth: [
+              "step", ["zoom"],
+              12, 2,
+              13.5, 5,
+            ],
             lineColor: COLORS.USE_WITH_CAUTION,
           }}
           visible={cautionStreetShown}
@@ -149,7 +157,7 @@ function MapView() {
         <PointFeature
           featureName="bike-shop"
           featureImage={ICONS.BIKE_SHOP}
-          visible={bikeRepairShown}
+          visible={bikeShopShown}
         />
         <PointFeature
           featureName="red-bike-station"
@@ -159,7 +167,11 @@ function MapView() {
         />
       </MapboxGL.MapView>
       <LegendButton onPress={() => legendSheet?.current?.expand()} />
-      <UserLocationButton onPress={() => camera?.current?.flyTo(userLocation?.current?.state?.coordinates)} />
+      <UserLocationButton
+        onPress={() =>
+          camera?.current?.flyTo(userLocation?.current?.state?.coordinates)
+        }
+      />
       <BottomSheet
         ref={bottomSheet}
         enablePanDownToClose
@@ -186,6 +198,8 @@ function MapView() {
           setCautionStreetShown={setCautionStreetShown}
           setRedBikeShown={setRedBikeShown}
           setBikeRepairShown={setBikeRepairShown}
+          bikeShopShown={bikeShopShown}
+          setBikeShopShown={setBikeShopShown}
         />
       </BottomSheet>
     </>

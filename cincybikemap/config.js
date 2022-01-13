@@ -1,9 +1,9 @@
 export const SERVER_URL = 'https://cincy-bike-map.herokuapp.com/';
 
 export const COLORS = {
-  BIKE_LANE: '#099e1d',
-  SLOW_STREET: '#00e6b4',
-  USE_WITH_CAUTION: '#e8a813',
+  BIKE_LANE: 'rgba(9, 158, 29, 0.5)',
+  SLOW_STREET: 'rgba(0, 230, 180, 0.4)',
+  USE_WITH_CAUTION: 'rgba(232, 168, 19, 0.5)',
 };
 
 export const ICONS = {

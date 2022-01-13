@@ -1,12 +1,5 @@
-import React, {useRef, useState} from 'react';
-import {
-  View,
-  StyleSheet,
-  Text,
-  SafeAreaView,
-  TouchableHighlight,
-  Linking,
-} from 'react-native';
+import React from 'react';
+import {View, Text, SafeAreaView, TouchableHighlight} from 'react-native';
 
 const LegendButton = ({onPress}) => {
   return (
@@ -14,7 +7,7 @@ const LegendButton = ({onPress}) => {
       style={{
         position: 'absolute',
         right: 0,
-        bottom: 0,
+        top: 100,
       }}>
       <SafeAreaView style={{margin: 10}}>
         <TouchableHighlight

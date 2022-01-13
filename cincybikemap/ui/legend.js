@@ -73,6 +73,8 @@ const Legend = props => {
     setCautionStreetShown,
     setRedBikeShown,
     setBikeRepairShown,
+    bikeShopShown,
+    setBikeShopShown,
   } = props;
   return (
     <ScrollView style={styles.scrollView}>
@@ -109,6 +111,12 @@ const Legend = props => {
         checked={bikeRepairShown}
         onCheck={setBikeRepairShown}
       />
+      <IconRow
+        label="Bike Shop"
+        iconSrc={ICONS.BIKE_SHOP}
+        checked={bikeShopShown}
+        onCheck={setBikeShopShown}
+      />      
     </ScrollView>
   );
 };

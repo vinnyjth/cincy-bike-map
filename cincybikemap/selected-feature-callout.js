@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
         // iOS blue from https://developer.apple.com/ios/human-interface-guidelines/visual-design/color/
         color: 'white',
         fontSize: 18,
+        padding: 2,
       },
       android: {
         color: 'white',
