@@ -5,7 +5,7 @@ require 'pg'
 require 'csv'
 require 'open-uri'
 
-CONN = PG.connect "***REMOVED***"
+CONN = PG.connect ENV['DATABASE_URL']
 
 def quote_string(v)
   v.to_s.gsub(/\\/, '\&\&').gsub(/'/, "''")

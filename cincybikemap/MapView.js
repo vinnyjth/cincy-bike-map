@@ -9,8 +9,9 @@ import UserLocationButton from './ui/user-location-button';
 import Legend from './ui/legend';
 import BottomSheet from '@gorhom/bottom-sheet';
 import {COLORS, ICONS} from './config.js';
+import Config from "react-native-config";
 
-MapboxGL.setAccessToken('N2nAGwZyiTGggBTwzZcv');
+MapboxGL.setAccessToken(Config.MAP_TILER_TOKEN);
 
 const styles = StyleSheet.create({
   map: {
@@ -78,10 +79,8 @@ function MapView() {
       <MapboxGL.MapView
         ref={_map}
         style={styles.map}
-        styleJSON={
-          'https://api.maptiler.com/maps/11e6eaeb-2b76-4eab-b098-bc0b0b1840cc/style.json?key=N2nAGwZyiTGggBTwzZcv'
-        }
-        onDidFailLoadingMap={(e) => console.log('failed', e)}
+        styleJSON={`https://api.maptiler.com/maps/11e6eaeb-2b76-4eab-b098-bc0b0b1840cc/style.json?key=${Config.MAP_TILER_TOKEN}`}
+        onDidFailLoadingMap={e => console.log('failed', e)}
         logoEnabled={false}
         showUserLocation
         compassEnabled
@@ -104,11 +103,7 @@ function MapView() {
           featureName="bike-lane"
           style={{
             lineDasharray: [2, 4],
-            lineWidth: [
-              "step", ["zoom"],
-              12, 2,
-              13.5, 5,
-            ],
+            lineWidth: ['step', ['zoom'], 12, 2, 13.5, 5],
             lineColor: COLORS.BIKE_LANE,
           }}
           visible={bikeLaneShown}
@@ -116,11 +111,7 @@ function MapView() {
         <LineFeature
           featureName="multi-use-path"
           style={{
-            lineWidth: [
-              "step", ["zoom"],
-              12, 2,
-              13.5, 5,
-            ],
+            lineWidth: ['step', ['zoom'], 12, 2, 13.5, 5],
             lineColor: COLORS.BIKE_LANE,
           }}
           visible={bikeLaneShown}
@@ -128,11 +119,7 @@ function MapView() {
         <LineFeature
           featureName="tst-slow-street"
           style={{
-            lineWidth: [
-              "step", ["zoom"],
-              12, 2,
-              13.5, 5,
-            ],
+            lineWidth: ['step', ['zoom'], 12, 2, 13.5, 5],
             lineColor: COLORS.SLOW_STREET,
           }}
           visible={slowStreetShown}
@@ -140,11 +127,7 @@ function MapView() {
         <LineFeature
           featureName="tst-use-with-caution"
           style={{
-            lineWidth: [
-              "step", ["zoom"],
-              12, 2,
-              13.5, 5,
-            ],
+            lineWidth: ['step', ['zoom'], 12, 2, 13.5, 5],
             lineColor: COLORS.USE_WITH_CAUTION,
           }}
           visible={cautionStreetShown}
