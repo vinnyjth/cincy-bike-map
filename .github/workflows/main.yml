@@ -30,9 +30,11 @@ jobs:
         env:
           DEPLOYMENT_CERTIFICATE: ${{ secrets.DEPLOYMENT_CERTIFICATE }}
           APP_STORE_KEY: ${{ secrets.APP_STORE_KEY }}
+          APP_ENV: ${{ secrets.APP_ENV }}
         run: |
           echo $DEPLOYMENT_CERTIFICATE | base64 --decode > ios/distribution.p12        
           echo $APP_STORE_KEY | base64 --decode > ios/app_store_key.p8        
+          echo $APP_ENV | base64 --decode > ios/.env
       - name: Execute Fastlane command
         env:
           API_KEY_ID: ${{ secrets.API_KEY_ID }}
