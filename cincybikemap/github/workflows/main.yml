@@ -1,0 +1,41 @@
+name: Publish iOS and Android App to App Store and Play Store
+on:
+  push:
+    branch:
+      - "master"
+jobs:
+  release-ios:
+    defaults:
+      run:
+        working-directory: cincybikemap
+    name: Build and release iOS app
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "16.x"
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: "3.x"
+      - name: Install Fastlane
+        run: cd ios && bundle install
+      - name: Install packages
+        run: yarn install
+      - name: Install pods
+        run: yarn pods
+      - name: Retrieve certificates and decode to a file
+        env:
+          DEPLOYMENT_CERTIFICATE: ${{ secrets.DEPLOYMENT_CERTIFICATE }}
+          APP_STORE_KEY: ${{ secrets.APP_STORE_KEY }}
+        run: |
+          echo $DEPLOYMENT_CERTIFICATE | base64 --decode > ios/distribution.p12        
+          echo $APP_STORE_KEY | base64 --decode > ios/app_store_key.p8        
+      - name: Execute Fastlane command
+        env:
+          API_KEY_ID: ${{ secrets.API_KEY_ID }}
+          API_KEY_ISSUER_ID: ${{ secrets.API_KEY_ISSUER_ID }}
+          CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
+        run: cd ios && fastlane github
