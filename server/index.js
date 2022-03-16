@@ -1,3 +1,4 @@
+const corsMiddleware = require('restify-cors-middleware')
 const restify = require('restify');
 const Pool = require('pg').Pool
 
@@ -53,6 +54,14 @@ function respondLine(req, res, next) {
 }
 
 var server = restify.createServer();
+
+const cors = corsMiddleware({
+  origins: ['*'],
+})
+
+server.pre(cors.preflight)
+server.use(cors.actual)
+
 server.get('/point-features/:type', respondPoint);
 server.head('/point-features/:type', respondPoint);
 
