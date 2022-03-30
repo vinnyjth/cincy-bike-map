@@ -2,7 +2,7 @@ import React from 'react';
 import {SERVER_URL} from '../config';
 import { Layer, Source } from "react-map-gl";
 
-const LineFeature = ({featureName, featureImage, style, visible}) => {
+const LineFeature = ({featureName, featureImage, category, style, visible}) => {
   const [stations, setStations] = React.useState([]);
 
   React.useEffect(() => {
@@ -13,6 +13,7 @@ const LineFeature = ({featureName, featureImage, style, visible}) => {
       setStations(stations);
     })();
   }, []);
+  
 
   return (
     <>
@@ -27,6 +28,7 @@ const LineFeature = ({featureName, featureImage, style, visible}) => {
             properties: {
               type: featureName,
               name: name,
+              category,
             },
             geometry: {
               ...geo_json,
@@ -36,6 +38,7 @@ const LineFeature = ({featureName, featureImage, style, visible}) => {
       >
               <Layer
         id={featureName}
+        beforeId="poi_transit"
         type="line"
         layout={{
           visibility: visible ? 'visible' : 'none',
