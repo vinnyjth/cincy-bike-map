@@ -90,6 +90,12 @@ def tst_data_calm_streets
 
   ### Use With Caution
   insert_lines(type: 'tst-use-with-caution', layer_name: "UseWithCaution", layers: layers)
+
+  ### Bikes on Sidewalk
+  insert_lines(type: 'tst-walk-bikes-on-sidewalk', layer_name: "WalkYourBike", layers: layers)
+
+  ### Bikes on Sidewalk
+  insert_lines(type: 'tst-walk-bikes-on-sidewalk', layer_name: "WalkYourBike", layers: layers)  
 end
 
 def red_bike_data
