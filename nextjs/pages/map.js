@@ -6,7 +6,6 @@ import { COLORS, ICONS } from "../components/config.js";
 import Map, { Popup, NavigationControl, ScaleControl } from "react-map-gl";
 import maplibregl from "maplibre-gl";
 
-
 function MapView() {
   const _map = useRef(null);
   const camera = useRef(null);
@@ -79,7 +78,7 @@ function MapView() {
         "multi-use-path",
         "tst-slow-street",
         "tst-use-with-caution",
-        "tst-walk-bikes-on-sidewalk"
+        "tst-walk-bikes-on-sidewalk",
       ].forEach((layer) => {
         map.on("mousemove", layer, ({ features, lngLat }) => {
           if (features.length > 0) {
@@ -103,7 +102,7 @@ function MapView() {
                 longitude: lngLat.lng,
                 latitude: lngLat.lat,
                 content: hoveredFeature.properties.category,
-              });              
+              });
               map.setFeatureState(
                 { source: layer, id: hoveredFeature.id },
                 { hover: true }
@@ -124,11 +123,11 @@ function MapView() {
   const lineWidth = [
     "step",
     ["zoom"],
-    ["+", 2, ["case", ["boolean", ["feature-state", "hover"], false], 3, 0]],
+    ["+", 5, ["case", ["boolean", ["feature-state", "hover"], false], 3, 0]],
     12,
     ["+", 4, ["case", ["boolean", ["feature-state", "hover"], false], 3, 0]],
     13.5,
-    ["+", 5, ["case", ["boolean", ["feature-state", "hover"], false], 3, 0]],
+    ["+", 4, ["case", ["boolean", ["feature-state", "hover"], false], 3, 0]],
   ];
 
   return (
@@ -138,7 +137,7 @@ function MapView() {
         style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
         mapLib={maplibregl}
         ref={mapRef}
-        mapStyle={`https://api.maptiler.com/maps/11e6eaeb-2b76-4eab-b098-bc0b0b1840cc/style.json?key=N2nAGwZyiTGggBTwzZcv`}
+        mapStyle={`https://api.maptiler.com/maps/e49e15cf-ca6d-4ee3-bafc-43aa70f645da/style.json?key=N2nAGwZyiTGggBTwzZcv`}
         onDidFailLoadingMap={(e) => console.log("failed", e)}
         logoEnabled={false}
         showUserLocation
@@ -180,7 +179,6 @@ function MapView() {
           style={{
             "line-width": lineWidth,
             "line-color": COLORS.SLOW_STREET,
-            
           }}
           category="Low Stress Bike Route"
           visible={slowStreetShown}
@@ -201,13 +199,12 @@ function MapView() {
             // 'line-width': ['step', {input: ['get', 'zoom'], stop_output_0: 2, stop_input_1: 13.5, stop_output_1: 5}],
             "line-width": lineWidth,
             "line-dasharray": [1, 1],
-            "line-color": COLORS.SLOW_STREET,
-            
+            "line-color": COLORS.WALK_BIKE,
           }}
           category={"Walk Bike on Sidewalk"}
           visible={cautionStreetShown}
-        />        
-        <PointFeature
+        />
+        {/* <PointFeature
           featureName="bike-repair-station"
           featureImage={"bike-repair"}
           visible={bikeRepairShown}
@@ -223,7 +220,7 @@ function MapView() {
           featureImage={"red-bike"}
           style={{ "icon-size": 0.2 }}
           visible={redBikeShown}
-        />
+        /> */}
         {popup && (
           <Popup
             longitude={popup.longitude}
@@ -237,28 +234,32 @@ function MapView() {
           </Popup>
         )}
       </Map>
-      <div className="absolute bottom-2 left-2 p-2 bg-white w-60">
-        <div className="text-center m-2">Legend</div>
-        <div className="flex justify-items-center items-center">
-          <span className="m-2">Bike Lane</span>
-          <div
-            className="h-1 flex-1"
-            style={{ backgroundColor: COLORS.BIKE_LANE }}
-          ></div>
-        </div>
-        <div className="flex justify-items-center items-center">
-          <span className="m-2">Slow Street</span>
-          <div
-            className="h-1 flex-1"
-            style={{ backgroundColor: COLORS.SLOW_STREET }}
-          ></div>
-        </div>
-        <div className="flex justify-items-center items-center">
-          <span className="m-2">Use Caution</span>
-          <div
-            className="h-1 flex-1"
-            style={{ backgroundColor: COLORS.USE_WITH_CAUTION }}
-          ></div>
+      <div className="absolute bottom-0 left-0 p-2 bg-white drop-shadow-lg">
+        <div className="p-4 relative">
+        <div className="absolute top-0 left-0 w-20 h-full bg-[#f9d0a0]"></div>
+          <div className="relative">
+          <div className="flex justify-items-center items-center">
+            <div
+              className="h-1 w-20"
+              style={{ backgroundColor: COLORS.BIKE_LANE }}
+            ></div>
+            <span className="m-2">Trails, Paths, and Bike Lanes</span>
+          </div>
+          <div className="flex justify-items-center items-center">
+            <div
+              className="h-1 w-20"
+              style={{ backgroundColor: COLORS.SLOW_STREET }}
+            ></div>
+                        <span className="m-2">Low Stress Routes</span>
+          </div>
+          <div className="flex justify-items-center items-center">
+            <div
+              className="h-1 w-20"
+              style={{ backgroundColor: COLORS.USE_WITH_CAUTION }}
+            ></div>
+                        <span className="m-2">Use Caution</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
