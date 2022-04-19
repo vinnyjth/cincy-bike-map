@@ -161,8 +161,8 @@ function MapView() {
         onZoom={console.log}
         maxBounds={[-86.024447, 37.426663, -83.008239, 39.824396]}
         initialViewState={{
-          longitude: -84.5191,
-          latitude: 39.0653,
+          longitude: -84.5091,
+          latitude: 39.1023,
           zoom: 12,
         }}
         onPress={handlePress}
