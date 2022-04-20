@@ -60,6 +60,7 @@ function MapView() {
       if (!map) return;
       map.on("load", () => {
         directions.current = new MaplibreGlDirections(map, {
+          api: "https://cincy-bike-map-router.onrender.com/route/v1",
           profile: "bike",
           requestOptions: {
             alternatives: "true",
