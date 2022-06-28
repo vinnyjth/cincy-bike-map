@@ -86,16 +86,16 @@ def tst_data_calm_streets
   end
 
   ### Slow Streets
-  insert_lines(type: 'tst-slow-street', layer_name: "SlowStreet", layers: layers)
+  insert_lines(type: 'tst-slow-street', layer_name: "LowStress", layers: layers)
 
   ### Use With Caution
-  insert_lines(type: 'tst-use-with-caution', layer_name: "UseWithCaution", layers: layers)
+  insert_lines(type: 'tst-use-with-caution', layer_name: "Usewithcaution", layers: layers)
 
   ### Bikes on Sidewalk
-  insert_lines(type: 'tst-walk-bikes-on-sidewalk', layer_name: "WalkYourBike", layers: layers)
+  insert_lines(type: 'tst-walk-bikes-on-sidewalk', layer_name: "WalkBike", layers: layers)
 
   ### Bikes on Sidewalk
-  insert_lines(type: 'tst-walk-bikes-on-sidewalk', layer_name: "WalkYourBike", layers: layers)  
+  # insert_lines(type: 'tst-walk-bikes-on-sidewalk', layer_name: "Hills", layers: layers)  
 end
 
 def red_bike_data
