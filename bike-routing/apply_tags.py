@@ -23,7 +23,6 @@ class TstStreetHandler(osmium.SimpleHandler):
                     self.writer.add_way(w.replace(tags=new_tags))
         for key in self.tst_way_data:                    
             if w.id in self.tst_way_data[key]:
-                print("Found one")
                 new_tags = [tag for tag in w.tags]
                 new_tags.append((key, 'yes'))
                 self.writer.add_way(w.replace(tags=new_tags))
