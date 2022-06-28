@@ -94,6 +94,9 @@ def tst_data_calm_streets
   ### Bikes on Sidewalk
   insert_lines(type: 'tst-walk-bikes-on-sidewalk', layer_name: "WalkBike", layers: layers)
 
+  ### Existing Trails
+  insert_lines(type: 'tst-existing-trails', layer_name: "ExistingTrails", layers: layers)
+
   ### Bikes on Sidewalk
   # insert_lines(type: 'tst-walk-bikes-on-sidewalk', layer_name: "Hills", layers: layers)  
 end
