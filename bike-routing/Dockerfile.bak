@@ -1,0 +1,46 @@
+FROM osrm/osrm-backend:latest
+
+WORKDIR /data
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl osmium-tool
+RUN apt-get install -y \
+    g++ cmake cmake-curses-gui make libexpat1-dev zlib1g-dev libbz2-dev libsparsehash-dev liblz4-1  \
+    libboost-program-options-dev libboost-dev libgdal-dev libproj-dev doxygen graphviz pandoc build-essential \
+    libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libsqlite3-dev libreadline-dev libffi-dev libbz2-dev -y
+
+
+RUN curl https://www.python.org/ftp/python/3.7.13/Python-3.7.13.tar.xz -o Python-3.7.13.tar.xz
+RUN tar -xf Python-3.7.13.tar.xz && mv Python-3.7.13 /usr/
+
+RUN cd /usr/Python-3.7.13 && \
+    ./configure --enable-optimizations --enable-shared && \
+    make && \
+    make altinstall && \
+    ldconfig /usr/Python-3.7.13
+
+RUN pip3 install wheel nose setuptools
+RUN pip3 install osmium
+
+
+
+RUN curl http://download.geofabrik.de/north-america/us/ohio-latest.osm.pbf -o ohio-latest.osm.pbf && \
+    curl http://download.geofabrik.de/north-america/us/kentucky-latest.osm.pbf -o kentucky-latest.osm.pbf
+
+RUN osmium merge ohio-latest.osm.pbf kentucky-latest.osm.pbf -o oky.osm.pbf --overwrite && \
+    osmium extract -b -85.256183,38.823584,-83.830707,39.539452 oky.osm.pbf -o oky-cincy.osm.pbf --overwrite    
+
+FROM python:slim-bullseye
+
+RUN python apply_tags.py    
+
+FROM osrm/osrm-backend:latest
+RUN osrm/osrm-backend osrm-extract -p cincy-bike.lua oky-cincy-tagged.osm.pbf && \
+    osrm/osrm-backend osrm-partition oky-cincy-tagged.osrm && \
+    osrm/osrm-backend osrm-customize oky-cincy-tagged.osrm
+
+# RUN curl http://download.geofabrik.de/asia/nepal-latest.osm.pbf --output np-latest.osm.pbf && \
+#     osrm-extract -p /opt/car.lua np-latest.osm.pbf && \
+#     osrm-partition np-latest.osrm && \
+#     osrm-customize np-latest.osrm
+
+CMD ["osrm-routed", "--algorithm", "mld", "oky-cincy-tagged.osrm", "--max-matching-size","1000", "--max-table-size","1000"]

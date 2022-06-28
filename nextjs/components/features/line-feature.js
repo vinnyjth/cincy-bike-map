@@ -1,19 +1,24 @@
-import React from 'react';
-import {SERVER_URL} from '../config';
+import React from "react";
+import { SERVER_URL } from "../config";
 import { Layer, Source } from "react-map-gl";
 
-const LineFeature = ({featureName, featureImage, category, style, visible}) => {
+const LineFeature = ({
+  featureName,
+  featureImage,
+  category,
+  style,
+  visible,
+}) => {
   const [stations, setStations] = React.useState([]);
 
   React.useEffect(() => {
     (async () => {
       const stations = await fetch(
-        SERVER_URL + `line-features/${featureName}`,
-      ).then(r => r.json());
+        SERVER_URL + `line-features/${featureName}`
+      ).then((r) => r.json());
       setStations(stations);
     })();
   }, []);
-  
 
   return (
     <>
@@ -22,9 +27,9 @@ const LineFeature = ({featureName, featureImage, category, style, visible}) => {
         id={featureName}
         type="geojson"
         data={{
-          type: 'FeatureCollection',
-          features: stations.map(({geo_json, name}) => ({
-            type: 'Feature',
+          type: "FeatureCollection",
+          features: stations.map(({ geo_json, name }) => ({
+            type: "Feature",
             properties: {
               type: featureName,
               name: name,
@@ -36,20 +41,20 @@ const LineFeature = ({featureName, featureImage, category, style, visible}) => {
           })),
         }}
       >
-              <Layer
-        id={featureName}
-        beforeId="poi_transit"
-        type="line"
-        layout={{
-          visibility: visible ? 'visible' : 'none',
-        }}
-        paint={{
-          ...style,
-        }}
-      />
-        </Source>
+        <Layer
+          id={featureName}
+          beforeId="poi_transit"
+          type="line"
+          layout={{
+            visibility: visible ? "visible" : "none",
+          }}
+          paint={{
+            ...style,
+          }}
+        />
+      </Source>
     </>
   );
 };
 
-export default LineFeature
+export default LineFeature;

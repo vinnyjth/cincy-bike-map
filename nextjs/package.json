@@ -7,6 +7,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@maplibre/maplibre-gl-directions": "^0.1.2",
     "mapbox-gl": "npm:empty-npm-package@1.0.0",
     "maplibre-gl": "^2.1.7",
     "next": "12.1.0",
