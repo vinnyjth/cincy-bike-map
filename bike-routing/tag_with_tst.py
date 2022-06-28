@@ -70,7 +70,7 @@ def match_line_ways(coordinates, route):
 
     try:
         ret = [e["way_id"] for e in response.json()["edges"]]
-        print(".")
+        print(".", end="", flush=True)
         return ret
     except KeyError:
         print("Key Error")

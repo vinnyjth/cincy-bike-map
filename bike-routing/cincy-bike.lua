@@ -291,6 +291,7 @@ function handle_bicycle_tags(profile,way,result,data)
   data.tst_preferred = way:get_value_by_key("tst-slow-street") or false
   data.tst_sidewalk = way:get_value_by_key("tst-walk-bikes-on-sidewalk") or false
   data.tst_mup = way:get_value_by_key("tst-existing-trails") or false
+  data.tst_bike_lane = way:get_value_by_key("tst-bike-lanes") or false
   
   speed_handler(profile,way,result,data)
 
@@ -577,8 +578,6 @@ function safety_handler(profile,way,result,data)
     end
 
     if data.tst_mup then 
-      print('mup')
-      print(way)          
       safety_bonus = 10
       if result.forward_speed > 0 then
         -- convert from km/h to m/s
@@ -591,9 +590,22 @@ function safety_handler(profile,way,result,data)
       if result.duration > 0 then
         result.weight = result.duration * safety_bonus
       end
+    elseif data.tst_bike_lane then 
+      print('bike lane')
+      safety_bonus = 9.5
+      if result.forward_speed > 0 then
+        -- convert from km/h to m/s
+        result.forward_rate = result.forward_speed / 3.6 * safety_bonus
+      end
+      if result.backward_speed > 0 then
+        -- convert from km/h to m/s
+        result.backward_rate = result.backward_speed / 3.6 * safety_bonus
+      end
+      if result.duration > 0 then
+        result.weight = result.duration * safety_bonus
+      end      
     elseif data.tst_preferred then 
       print('preferred')
-      print(way)      
       safety_bonus = 9
       if result.forward_speed > 0 then
         -- convert from km/h to m/s
@@ -608,7 +620,6 @@ function safety_handler(profile,way,result,data)
       end
     elseif data.tst_caution then
       print('caution')
-      print(way)
       safety_bonus = 2
       if result.forward_speed > 0 then
         -- convert from km/h to m/s
