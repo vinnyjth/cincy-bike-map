@@ -1,0 +1,2 @@
+osmium==3.3.0
+python-dotenv==0.20.0

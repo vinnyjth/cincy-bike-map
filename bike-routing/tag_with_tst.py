@@ -2,9 +2,10 @@ import psycopg2
 import requests
 import json
 from dotenv import load_dotenv
-# import os
+import os
 
-# load_dotenv()  # take environment variables from .env.
+load_dotenv()  # take environment variables from .env.
+print("Database URL: ", os.getenv("DATABASE_URL"))
 
 def get_tst_data():
     lines = []
