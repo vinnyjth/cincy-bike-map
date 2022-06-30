@@ -9,11 +9,19 @@ find_access_tag = require("lib/access").find_access_tag
 limit = require("lib/maxspeed").limit
 Measure = require("lib/measure")
 
+list = {0.4040111813705065,0.4077509707194649,0.4115930094776843,0.41554190707638683,0.419602561205936,0.42378018077868934,0.4280803111034602,0.43250886151983375,0.43707213577212073,0.4417768654386842,0.44663024677340407,0.4516399813629164,0.45681432105685077,0.46216211768961296,0.46769287818247157,0.47341682569514565,0.4793449675882814,0.4854891710638476,0.4918622474715554,0.49847804640803445,0.5053515608941388,0.5124990450969183,0.5199381462693039,0.5276880528151419,0.5357696606525774,0.5442057603471956,0.5530212478192406,0.5622433617966259,0.5719019515848806,0.5820297791502957,0.5926628599510663,0.6038408473818764,0.6156074660856684,0.6280109996784702,0.6411048385477748,0.6549480932017125,0.6696062779906035,0.6851520686459992,0.7016661346382446,0.7192380433680241,0.7379672270496413,0.7579639940024726,0.7793505529460762,0.8022620006557876,0.826847198831215,0.8532694343893874,0.8817067185549876,0.9123515356952666,0.9454098073807813,0.9810987996660977,1.0196436869904062,1.0612725155267435,1.1062094072354913,1.154666035145556,1.206831686614459,1.262862588811012,1.3228715297368607,1.386919058946579,1.4550075750313445,1.5270793258312663,1.603018782583213,1.6826591333307126,1.7657919757398155,1.8521788610886971,1.9415632418225015,2.0336815766458516,2.1282727347390007,2.2250852757628166,2.3238825566437655,2.4244458751913984,2.526575998468329,2.6300934640510762,2.734838018511459,2.8406675004812123,2.9474564080893972,3.05509432606533,3.1634843330276547,3.2725414664448174,3.382191290874559,3.492368592633609,3.6030162089714017,3.7140839902231964,3.825527887713802,3.937309157144547,4.049393665912615,4.1617512926354046,4.274355407635642,4.387182423985552,4.50021140971591,4.613423752846485,4.726802871914744,4.840333965631132,4.954003796150395,5.0678005012152,5.181713431100397,5.295733006870892,5.409850596970382,5.524058409591401,5.638349398647695,5.7527171814864015}
+min_slope = -0.25
+max_slope = 0.25
+N = 100
+
 function setup()
   local default_speed = 15
   local walking_speed = 4
   local preferred_speed = 20
   local caution_speed = 17
+
+
+  local raster_path = os.getenv('OSRM_RASTER_SOURCE') or "/data/rastersource.asc"
 
   return {
     properties = {
@@ -27,6 +35,16 @@ function setup()
       continue_straight_at_waypoint = false,
       mode_change_penalty           = 30,
     },
+
+    raster_source = raster:load(
+      raster_path,
+      -85,    -- lon_min
+      80,  -- lon_max
+      35,    -- lat_min
+      40,  -- lat_max
+      6000,    -- nrows
+      6000     -- ncols
+    ),
 
     default_mode              = mode.cycling,
     default_speed             = default_speed,
@@ -213,6 +231,46 @@ function setup()
       'construction'
     }
   }
+end
+
+function process_segment (profile, segment)
+  local sourceData = raster:interpolate(profile.raster_source, segment.source.lon, segment.source.lat)
+  local targetData = raster:interpolate(profile.raster_source, segment.target.lon, segment.target.lat)
+  
+  local invalid = sourceData.invalid_data()
+  local scaled_weight = segment.weight
+  local scaled_duration = segment.duration
+  --io.write("evaluating segment: " .. sourceData.datum .. " m to " .. targetData.datum .. " m with distance " .. segment.distance .. "\n")
+
+  if sourceData.datum == invalid then
+    print("invalid")
+  end
+
+  if sourceData.datum ~= invalid and targetData.datum ~= invalid and segment.distance > 0 then
+    local slope = (targetData.datum - sourceData.datum) / segment.distance
+	local slope_idx = math.floor((slope - min_slope) / (max_slope - min_slope) * N)
+	if slope_idx < 1 then
+		slope_idx = 1
+	end
+	if slope_idx > N then
+		slope_idx = N
+	end
+	
+	scaled_weight = list[slope_idx] * scaled_weight
+	scaled_duration = list[slope_idx] * scaled_duration
+	
+	--original calculation: is undefined for slope = 0.2
+    --scaled_weight = scaled_weight / (1.0 - (slope * 5.0))
+    --scaled_duration = scaled_duration / (1.0 - (slope * 5.0))
+	--io.write("   slope: " .. slope .. "\n")
+	--io.write("   was weight: " .. segment.weight .. "\n")
+	--io.write("   new weight: " .. scaled_weight .. "\n")
+	--io.write("   was duration: " .. segment.duration .. "\n")
+	--io.write("   new duration: " .. scaled_duration .. "\n")
+  end
+
+  segment.weight = scaled_weight
+  segment.duration = scaled_duration
 end
 
 function process_node(profile, node, result)
@@ -592,7 +650,7 @@ function safety_handler(profile,way,result,data)
       end
     elseif data.tst_bike_lane then 
       print('bike lane')
-      safety_bonus = 9.5
+      safety_bonus = 8.5
       if result.forward_speed > 0 then
         -- convert from km/h to m/s
         result.forward_rate = result.forward_speed / 3.6 * safety_bonus
@@ -756,5 +814,6 @@ return {
   setup = setup,
   process_way = process_way,
   process_node = process_node,
+  process_segment = process_segment,
   process_turn = process_turn
 }

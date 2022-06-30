@@ -24,6 +24,7 @@ RUN pip3 install osmium
 COPY apply_tags.py /data/apply_tags.py
 COPY tst_tagged_nodes.json /data/tst_tagged_nodes.json
 COPY tst_tagged_ways.json /data/tst_tagged_ways.json
+COPY rastersource.asc /data/rastersource.asc
 RUN python3 ./apply_tags.py    
 
 

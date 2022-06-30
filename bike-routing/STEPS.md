@@ -16,3 +16,9 @@ docker run -t -v "${PWD}:/data" osrm/osrm-backend osrm-partition /data/oky-cincy
 docker run -t -v "${PWD}:/data" osrm/osrm-backend osrm-customize /data/oky-cincy-tagged.osrm
 docker run -t -i -p 5005:5000 -v "${PWD}:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/oky-cincy-tagged.osrm
 ```
+
+# Elevation // Generating Rastersource.py
+```
+curl https://srtm.csi.cgiar.org/wp-content/uploads/files/srtm_5x5/ASCII/srtm_20_05.zip -o srtm_20_05.zip
+unzip srtm_20_05.zip
+python generate_rastersource.py
