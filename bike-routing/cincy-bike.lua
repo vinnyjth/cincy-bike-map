@@ -20,7 +20,6 @@ function setup()
   local preferred_speed = 20
   local caution_speed = 17
 
-
   local raster_path = os.getenv('OSRM_RASTER_SOURCE') or "/data/rastersource.asc"
 
   return {
