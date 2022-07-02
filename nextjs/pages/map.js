@@ -2,7 +2,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import React, { useRef, useState } from "react";
 import PointFeature from "../components/features/point-feature";
 import LineFeature from "../components/features/line-feature";
-import { COLORS, ICONS } from "../components/config.js";
+import { COLORS, ICONS, MAP_ID } from "../components/config.js";
 import Map, { Popup, NavigationControl, ScaleControl } from "react-map-gl";
 import maplibregl from "maplibre-gl";
 import MaplibreGlDirections from "@maplibre/maplibre-gl-directions";
@@ -151,7 +151,7 @@ function MapView() {
         style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
         mapLib={maplibregl}
         ref={mapRef}
-        mapStyle={`https://api.maptiler.com/maps/e49e15cf-ca6d-4ee3-bafc-43aa70f645da/style.json?key=N2nAGwZyiTGggBTwzZcv`}
+        mapStyle={`https://api.maptiler.com/maps/${MAP_ID}/style.json?key=N2nAGwZyiTGggBTwzZcv`}
         onDidFailLoadingMap={(e) => console.log("failed", e)}
         logoEnabled={false}
         showUserLocation
