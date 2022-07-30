@@ -68,6 +68,8 @@ function MapView() {
           profile: "bike",
           requestOptions: {
             alternatives: "true",
+            annotations: 'true',
+            overview: "full",
           },
         });
         directions.current.interactive = true;
