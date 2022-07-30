@@ -6,6 +6,8 @@ import { COLORS, ICONS, MAP_ID } from "../components/config.js";
 import Map, { Popup, NavigationControl, ScaleControl } from "react-map-gl";
 import maplibregl from "maplibre-gl";
 import MaplibreGlDirections from "@maplibre/maplibre-gl-directions";
+import Legend from "../components/legend";
+import Geocoder, { Geo } from "../components/geocoder";
 
 function MapView() {
   const _map = useRef(null);
@@ -53,10 +55,12 @@ function MapView() {
 
   const [popup, setPopup] = useState(null);
 
+  const m = useRef(null);
   const mapRef = React.useCallback((ref) => {
     let hoveredFeatureIds = [];
     if (ref) {
       const map = ref.getMap();
+      m.current = map;
       if (!map) return;
       map.on("load", () => {
         directions.current = new MaplibreGlDirections(map, {
@@ -248,47 +252,28 @@ function MapView() {
           </Popup>
         )}
       </Map>
-      <div className="absolute bottom-0 left-0 p-2 bg-white drop-shadow-lg">
-        <div className="p-4 relative">
-          <div className="absolute top-0 left-0 w-16 h-full bg-[#f9d0a0]"></div>
-          <div className="relative">
-            <div className="flex justify-items-center items-center">
-              <div
-                className="h-1 w-20"
-                style={{ backgroundColor: COLORS.BIKE_LANE }}
-              ></div>
-              <span className="m-2">Trails, Paths, and Bike Lanes</span>
-              <input
-                type={"checkbox"}
-                checked={bikeLaneShown}
-                onChange={() => setBikeLaneShown((prev) => !prev)}
-              />
-            </div>
-            <div className="flex justify-items-center items-center">
-              <div
-                className="h-1 w-20"
-                style={{ backgroundColor: COLORS.SLOW_STREET }}
-              ></div>
-              <span className="m-2">Low Stress Routes</span>
-              <input type={"checkbox"} 
-                checked={slowStreetShown}
-                onChange={() => setSlowStreetShown((prev) => !prev)}              
-              />
-            </div>
-            <div className="flex justify-items-center items-center">
-              <div
-                className="h-1 w-20"
-                style={{ backgroundColor: COLORS.USE_WITH_CAUTION }}
-              ></div>
-              <span className="m-2">Use Caution</span>
-              <input
-                checked={cautionStreetShown}
-                onChange={() => setCautionStreetShown((prev) => !prev)}                            
-              type={"checkbox"} />
-            </div>
-          </div>
-        </div>
+      <div className="absolute top-2 left-2 flex justify-center flex-col drop-shadow-lg">
+        <Geocoder start onSubmit={(result) => {
+          if (result){
+            directions.current.addWaypoint([result.geometry.location.lng(), result.geometry.location.lat()], 0);
+            m.current.flyTo({center: [result.geometry.location.lng(), result.geometry.location.lat()]});
+          }
+        }} />
+        <Geocoder end onSubmit={(result) => {
+          if (result){
+            directions.current.addWaypoint([result.geometry.location.lng(), result.geometry.location.lat()]);
+            m.current.flyTo({center: [result.geometry.location.lng(), result.geometry.location.lat()]});
+          }
+        }} />
       </div>
+      <Legend
+        setBikeLaneShown={setBikeLaneShown}
+        setCautionStreetShown={setCautionStreetShown}
+        setSlowStreetShown={setSlowStreetShown}
+        slowStreetShown={slowStreetShown}
+        cautionStreetShown={cautionStreetShown}
+        bikeLaneShown={bikeLaneShown}
+      />
     </div>
   );
 }

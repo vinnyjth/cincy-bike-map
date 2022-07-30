@@ -47,6 +47,7 @@ const LineFeature = ({
           type="line"
           layout={{
             visibility: visible ? "visible" : "none",
+            "line-cap": "round",
           }}
           paint={{
             ...style,
