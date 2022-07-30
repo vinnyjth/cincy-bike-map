@@ -255,8 +255,8 @@ function process_segment (profile, segment)
 		slope_idx = N
 	end
 	
-	scaled_weight = list[slope_idx] * scaled_weight * 10
-	scaled_duration = list[slope_idx] * scaled_duration * 10
+	scaled_weight = list[slope_idx] * scaled_weight
+	scaled_duration = list[slope_idx] * scaled_duration
 	
 	--original calculation: is undefined for slope = 0.2
     --scaled_weight = scaled_weight / (1.0 - (slope * 5.0))
